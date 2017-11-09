@@ -11,7 +11,7 @@ exports.has_body = (req, res, next) => next(req.body == null ? new custom_restif
 exports.mk_valid_body_mw = (json_schema, to_res = true) => (req, res, next) => {
     const body_is = tv4_1.validateMultiple(req.body, json_schema);
     if (!body_is.valid)
-        (error => to_res ? res.json(400, error) : req['json_schema_error'] = error)(body_is.errors.length === 1 ? {
+        (error => to_res ? res.json(400, error) && next(false) : req['json_schema_error'] = error)(body_is.errors.length === 1 ? {
             error: 'ValidationError',
             error_message: body_is.errors[0].message
         } : {
@@ -32,7 +32,8 @@ exports.mk_valid_body_mw = (json_schema, to_res = true) => (req, res, next) => {
                 valid: body_is.valid
             }
         });
-    return next();
+    else
+        return next();
 };
 exports.mk_valid_body_mw_ignore = (json_schema, ignore) => {
     return function valid_body(req, res, next) {
