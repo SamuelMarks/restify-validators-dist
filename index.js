@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const custom_restify_errors_1 = require("custom-restify-errors");
 const tv4_1 = require("tv4");
+const nodejs_utils_1 = require("nodejs-utils");
 exports.has_body = (req, res, next) => next(req.body == null ? new custom_restify_errors_1.GenericError({
     name: 'ValidationError',
     error: 'ValidationError',
@@ -58,6 +59,35 @@ exports.mk_valid_body_mw_ignore = (json_schema, ignore) => {
                 && !req['json_schema_error'].error_metadata.errors.length)
             delete req['json_schema_error'];
         return next();
+    };
+};
+exports.jsonSchemaNamedArrayOf = (json_schema, type_name, type_plural) => {
+    type_name = type_name || json_schema.title.toString();
+    const upper_of_type = nodejs_utils_1.toSentenceCase(type_name);
+    const upper_of_types = nodejs_utils_1.toSentenceCase(type_plural || `${type_name}s`);
+    const lower_types = upper_of_types.toLocaleLowerCase();
+    return {
+        $schema: 'http://json-schema.org/draft-06/schema#',
+        $ref: `#/definitions/${upper_of_types}`,
+        definitions: {
+            [upper_of_types]: {
+                type: 'object',
+                additionalProperties: false,
+                properties: {
+                    [lower_types]: {
+                        type: 'array',
+                        items: {
+                            $ref: `#/definitions/${upper_of_type}`
+                        }
+                    }
+                },
+                required: [
+                    lower_types
+                ],
+                title: lower_types
+            },
+            [upper_of_type]: json_schema
+        }
     };
 };
 exports.remove_from_body = (keys) => (req, res, next) => {

@@ -1,16 +1,17 @@
 {
   "name": "restify-validators",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Custom validators for the Node.JS restify framework.",
   "main": "index.js",
   "dependencies": {
     "custom-restify-errors": "https://api.github.com/repos/SamuelMarks/custom-restify-errors-dist/tarball",
+    "nodejs-utils": "https://api.github.com/repos/SamuelMarks/nodejs-utils-dist/tarball",
     "restify": "^7.1.1",
     "tv4": "^1.3.0"
   },
   "devDependencies": {
     "@types/bunyan": "1.8.4",
-    "@types/node": "^9.6.6",
+    "@types/node": "^10.0.0",
     "@types/restify": "^5.0.7",
     "@types/tv4": "^1.2.29"
   },
