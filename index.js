@@ -8,30 +8,31 @@ exports.has_body = (req, res, next) => next(req.body == null ? new custom_restif
     error_message: 'Body required',
     statusCode: 400
 }) : void 0);
+exports.jsonSchemaErrorParser = (body_is) => body_is.valid ? void 0 : body_is.errors.length === 1 ? {
+    error: 'ValidationError',
+    error_message: body_is.errors[0].message
+} : {
+    error: 'ValidationError',
+    error_message: 'JSON-Schema validation failed',
+    error_metadata: {
+        cls: 'tv4',
+        errors: body_is['errors'].map((error) => Object.assign({
+            code: error.code,
+            dataPath: error.dataPath,
+            message: error.message,
+            params: error.params,
+            schemaPath: error.schemaPath,
+            subErrors: error.subErrors
+        }, process.env['DEBUG_LEVEL'] && parseInt(process.env['DEBUG_LEVEL'], 10) > 2 ?
+            { stack: error.stack } : {})),
+        missing: body_is.missing,
+        valid: body_is.valid
+    }
+};
 exports.mk_valid_body_mw = (json_schema, to_res = true) => (req, res, next) => {
     const body_is = tv4_1.validateMultiple(req.body, json_schema);
     if (!body_is.valid)
-        (error => to_res ? res.json(400, error) && next(false) : req['json_schema_error'] = error)(body_is.errors.length === 1 ? {
-            error: 'ValidationError',
-            error_message: body_is.errors[0].message
-        } : {
-            error: 'ValidationError',
-            error_message: 'JSON-Schema validation failed',
-            error_metadata: {
-                cls: 'tv4',
-                errors: body_is['errors'].map((error) => Object.assign({
-                    code: error.code,
-                    dataPath: error.dataPath,
-                    message: error.message,
-                    params: error.params,
-                    schemaPath: error.schemaPath,
-                    subErrors: error.subErrors
-                }, process.env['DEBUG_LEVEL'] && parseInt(process.env['DEBUG_LEVEL'], 10) > 2 ?
-                    { stack: error.stack } : {})),
-                missing: body_is.missing,
-                valid: body_is.valid
-            }
-        });
+        (error => to_res ? res.json(400, error) && next(false) : req['json_schema_error'] = error)(exports.jsonSchemaErrorParser(body_is));
     else
         return next();
 };
