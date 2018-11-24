@@ -13,7 +13,8 @@ Otherwise just use the [restify-validators-dist](https://github.com/SamuelMarks/
 
 Clone the dist repo in the same directory this repo was cloned into, then you can synchronise them with:
 
-    find -type f -not -name "*.ts" -and -not -path "./.git/*" -and -not -path "./node-modules/*" -and -not -name '*.map' | cpio -pdamv ../restify-validators-dist
+    dst="${PWD##*/}"-dist;
+    find -type f -not -path './node_modules*' -a -not -path './.git*' -a -not -path './.idea*' -a -not -path './typings*' -a -not -name '*.ts' -not -name 'ts*' | cpio -pdamv ../"$dst";
 
 Or simply:
 
