@@ -5,8 +5,7 @@ const tv4_1 = require("tv4");
 const nodejs_utils_1 = require("nodejs-utils");
 exports.has_body = (req, res, next) => next(req.body == null ? new custom_restify_errors_1.GenericError({
     name: 'ValidationError',
-    error: 'ValidationError',
-    error_message: 'Body required',
+    message: 'Body required',
     statusCode: 400
 }) : void 0);
 exports.jsonSchemaErrorParser = (body_is) => body_is.valid ? void 0 : body_is.errors.length === 1 ? {
